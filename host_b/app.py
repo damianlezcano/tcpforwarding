@@ -32,7 +32,7 @@ def handle_target_to_source(target_socket, source_socket):
 
 def start_server(source_port, target_port, certfile, keyfile):
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    context.load_cert_chain(certfile=certfile, keyfile=keyfile)
+    #context.load_cert_chain(certfile=certfile, keyfile=keyfile)
 
     context.check_hostname = False  # Ignorar la verificación del nombre del host
     context.verify_mode = ssl.CERT_NONE  # No verificar el certificado del servidor

@@ -28,7 +28,7 @@ def handle_client(local_socket, remote_socket):
 def start_proxy(local_port, remote_host, remote_port, certfile, keyfile):
     # Crear el contexto SSL para cliente
     context = ssl.create_default_context()
-    context.load_cert_chain(certfile, keyfile)
+    #context.load_cert_chain(certfile, keyfile)
     context.check_hostname = False  # Ignorar la verificación del nombre del host
     context.verify_mode = ssl.CERT_NONE  # No verificar el certificado del servidor
 
