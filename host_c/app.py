@@ -14,11 +14,12 @@ def forward_data(source, destination):
         source.close()
         destination.close()
 
-def forward_traffic(remote_host, remote_port, local_port, client_cert, client_key):
+#def forward_traffic(remote_host, remote_port, local_port, client_cert, client_key):
+def forward_traffic(remote_host, remote_port, local_port):
     try:
         # Crear contexto SSL adecuado para el cliente
         context = ssl.create_default_context()
-        context.load_cert_chain(certfile=client_cert, keyfile=client_key)  # Cargar certificado del cliente y clave privada
+        #context.load_cert_chain(certfile=client_cert, keyfile=client_key)  # Cargar certificado del cliente y clave privada
         context.check_hostname = False  # Ignorar la verificación del nombre del host
         context.verify_mode = ssl.CERT_NONE  # No verificar el certificado del servidor
         
@@ -53,9 +54,10 @@ if __name__ == "__main__":
     parser.add_argument('remote_host', type=str, help='Remote host to connect to.')
     parser.add_argument('remote_port', type=int, help='Remote port to connect to.')
     parser.add_argument('local_port', type=int, help='Local port to forward traffic to.')
-    parser.add_argument('client_cert', type=str, help='Path to the client certificate file.')
-    parser.add_argument('client_key', type=str, help='Path to the client key file.')
+    #parser.add_argument('client_cert', type=str, help='Path to the client certificate file.')
+    #parser.add_argument('client_key', type=str, help='Path to the client key file.')
 
     args = parser.parse_args()
 
-    forward_traffic(args.remote_host, args.remote_port, args.local_port, args.client_cert, args.client_key)
+    #forward_traffic(args.remote_host, args.remote_port, args.local_port, args.client_cert, args.client_key)
+    forward_traffic(args.remote_host, args.remote_port, args.local_port)

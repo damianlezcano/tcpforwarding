@@ -28,9 +28,12 @@ IP.2 = 192.168.0.15
 IP.3 = 192.168.0.26
 IP.4 = 192.168.0.109
 ```
-x.109 host_a
-x.15 host_b
-x.26 host_c
 
+- x.109 host_a
+- x.15 host_b
+- x.26 host_c
+
+```bash
 openssl genpkey -algorithm RSA -out key.pem
 openssl req -new -x509 -key key.pem -out cert.pem -days 365 -config openssl.cnf
+```

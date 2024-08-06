@@ -25,7 +25,8 @@ def handle_client(local_socket, remote_socket):
     local_socket.close()
     remote_socket.close()
 
-def start_proxy(local_port, remote_host, remote_port, certfile, keyfile):
+#def start_proxy(local_port, remote_host, remote_port, certfile, keyfile):
+def start_proxy(local_port, remote_host, remote_port):
     # Crear el contexto SSL para cliente
     context = ssl.create_default_context()
     #context.load_cert_chain(certfile, keyfile)
@@ -58,12 +59,13 @@ def main():
     parser.add_argument('local_port', type=int, help='Local port to listen on')
     parser.add_argument('remote_host', help='Remote host to forward to')
     parser.add_argument('remote_port', type=int, help='Remote port to forward to')
-    parser.add_argument('certfile', help='Path to SSL certificate file')
-    parser.add_argument('keyfile', help='Path to SSL key file')
+    #parser.add_argument('certfile', help='Path to SSL certificate file')
+    #parser.add_argument('keyfile', help='Path to SSL key file')
 
     args = parser.parse_args()
 
-    start_proxy(args.local_port, args.remote_host, args.remote_port, args.certfile, args.keyfile)
+    #start_proxy(args.local_port, args.remote_host, args.remote_port, args.certfile, args.keyfile)
+    start_proxy(args.local_port, args.remote_host, args.remote_port)
 
 if __name__ == '__main__':
     main()
