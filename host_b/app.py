@@ -10,7 +10,7 @@ def handle_source_to_target(source_socket, target_socket):
             data = source_socket.recv(4096)
             if not data:
                 break
-            print(f"Forwarding data from source to target: {data}")
+            print(f"Forwarding data from source to target")
             target_socket.sendall(data)
     except Exception as e:
         print(f"Error in source to target handler: {e}")
@@ -23,7 +23,7 @@ def handle_target_to_source(target_socket, source_socket):
             data = target_socket.recv(4096)
             if not data:
                 break
-            print(f"Forwarding data from target to source: {data}")
+            print(f"Forwarding data from target to source")
             source_socket.sendall(data)
     except Exception as e:
         print(f"Error in target to source handler: {e}")
