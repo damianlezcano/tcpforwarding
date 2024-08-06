@@ -6,11 +6,17 @@ import time
 
 def handle_client(local_socket, remote_host, remote_port, context):
     def relay(source, destination):
-        while True:
-            data = source.recv(4096)
-            if not data:
-                break
-            destination.sendall(data)
+        try:
+            while True:
+                data = source.recv(4096)
+                if not data:
+                    break
+                destination.sendall(data)
+        except (socket.error, ssl.SSLError, BrokenPipeError) as e:
+            print(f'Error during data relay: {e}. Closing connection...')
+        finally:
+            source.close()
+            destination.close()
     
     while True:
         try:
@@ -37,6 +43,7 @@ def handle_client(local_socket, remote_host, remote_port, context):
             continue
 
     local_socket.close()
+    remote_socket.close()
 
 def start_proxy(local_port, remote_host, remote_port):
     # Crear el contexto SSL para cliente y desactivar la verificación de certificados
