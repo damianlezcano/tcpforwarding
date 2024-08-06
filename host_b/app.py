@@ -31,6 +31,18 @@ def handle_target_to_source(target_socket, source_socket):
         target_socket.close()
         source_socket.close()
 
+def accept_connections(server_ssl, handler):
+    while True:
+        try:
+            client_socket, client_addr = server_ssl.accept()
+            print(f"Accepted connection from {client_addr}")
+            # Iniciar un nuevo hilo para manejar la conexión
+            threading.Thread(target=handler, args=(client_socket,)).start()
+        except ssl.SSLError as e:
+            print(f"SSL Error: {e}")
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+
 def start_server(source_port, target_port, certfile, keyfile):
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain(certfile, keyfile=keyfile)
@@ -49,26 +61,35 @@ def start_server(source_port, target_port, certfile, keyfile):
 
     target_server_ssl = context.wrap_socket(target_server, server_side=True)
 
-    while True:
-        try:
-            # Aceptar conexión en el puerto de origen
-            source_socket, source_addr = source_server_ssl.accept()
-            print(f"Accepted connection on source port from {source_addr}")
+    # Iniciar hilos para aceptar conexiones
+    threading.Thread(target=accept_connections, args=(source_server_ssl, lambda s: handle_source_connections(s, target_server_ssl))).start()
+    threading.Thread(target=accept_connections, args=(target_server_ssl, lambda s: handle_target_connections(s, source_server_ssl))).start()
 
-            # Aceptar conexión en el puerto de destino
-            target_socket, target_addr = target_server_ssl.accept()
-            print(f"Accepted connection on target port from {target_addr}")
+def handle_source_connections(source_socket, target_server_ssl):
+    try:
+        # Aceptar conexión en el puerto de destino
+        target_socket, _ = target_server_ssl.accept()
+        print(f"Accepted connection on target port for source client")
+        # Crear hilos para manejar las conexiones bidireccionales
+        threading.Thread(target=handle_source_to_target, args=(source_socket, target_socket)).start()
+        threading.Thread(target=handle_target_to_source, args=(target_socket, source_socket)).start()
+    except Exception as e:
+        print(f"Error handling source connections: {e}")
+    finally:
+        source_socket.close()
 
-            # Crear hilos para manejar las conexiones bidireccionales
-            source_to_target_thread = threading.Thread(target=handle_source_to_target, args=(source_socket, target_socket))
-            target_to_source_thread = threading.Thread(target=handle_target_to_source, args=(target_socket, source_socket))
-            
-            source_to_target_thread.start()
-            target_to_source_thread.start()
-        except ssl.SSLError as e:
-            print(f"SSL Error: {e}")
-        except Exception as e:
-            print(f"Unexpected Error: {e}")
+def handle_target_connections(target_socket, source_server_ssl):
+    try:
+        # Aceptar conexión en el puerto de origen
+        source_socket, _ = source_server_ssl.accept()
+        print(f"Accepted connection on source port for target client")
+        # Crear hilos para manejar las conexiones bidireccionales
+        threading.Thread(target=handle_source_to_target, args=(source_socket, target_socket)).start()
+        threading.Thread(target=handle_target_to_source, args=(target_socket, source_socket)).start()
+    except Exception as e:
+        print(f"Error handling target connections: {e}")
+    finally:
+        target_socket.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="HTTPS server to forward data bidirectionally between two ports.")
